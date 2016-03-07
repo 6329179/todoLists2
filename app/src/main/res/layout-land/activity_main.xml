@@ -40,13 +40,6 @@
             android:id="@+id/todoButton"
             android:layout_gravity="top" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Clear list"
-            android:id="@+id/clearButton"
-            android:layout_gravity="top" />
-
     </LinearLayout>
 
     <ListView

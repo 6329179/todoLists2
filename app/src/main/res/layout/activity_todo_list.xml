@@ -7,18 +7,18 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.onzin.lists.MainActivity"
+    tools:context="com.onzin.lists.TodoListActivity"
     android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="TO DO LIST APP!"
         android:textColor="#000000"
         android:textSize="40dp"
         android:textAlignment="center"
         android:gravity="center"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:id="@+id/listNameText" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -34,7 +34,7 @@
         <Button
             android:layout_width="80dp"
             android:layout_height="60dp"
-            android:text="New list"
+            android:text="ADD"
             android:id="@+id/todoButton"
             android:layout_gravity="center_vertical" />
 
@@ -47,5 +47,31 @@
 
 
     </ListView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear list"
+        android:id="@+id/clearButton" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:text="Back"
+        android:id="@+id/backButton" />
+
+
+
+
+    </LinearLayout>
+
+
 
 </LinearLayout>

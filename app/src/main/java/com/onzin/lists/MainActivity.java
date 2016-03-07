@@ -9,6 +9,9 @@ february 2016
 package com.onzin.lists;
 
 import android.annotation.TargetApi;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -46,45 +49,61 @@ public class MainActivity extends AppCompatActivity {
 
     EditText todoEdit;
     Button todoButton;
-    Button clearButton;
     ListView todoList;
 
     ArrayAdapter<String> todoAdapter;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_main);
 
-        // assign to each view a variable name
-        todoEdit = (EditText) findViewById(R.id.todoEdit);
-        todoButton = (Button) findViewById(R.id.todoButton);
-        clearButton = (Button) findViewById(R.id.clearButton);
-        todoList = (ListView) findViewById(R.id.todoList);
 
-        // setting up adapter and link it to the data Array
-        todoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoArray);
 
-        // linking adapter to the ListView
-        todoList.setAdapter(todoAdapter);
+            // assign to each view a variable name
+            todoEdit = (EditText) findViewById(R.id.todoEdit);
+            todoButton = (Button) findViewById(R.id.todoButton);
+            todoList = (ListView) findViewById(R.id.todoList);
 
-        // load the todolist from file and make sure first empty line is not included
-        loadTodo();
+            // setting up adapter and link it to the data Array
+            todoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoArray);
 
-        // create a longclick event on a list item to remove item
-        todoList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            // linking adapter to the ListView
+            todoList.setAdapter(todoAdapter);
 
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            // load the todolist from file
+            loadTodo();
+
+            // create a longclick event on a list item to remove item
+            todoList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
                 todoArray.remove(position);
                 todoAdapter.notifyDataSetChanged();
-                sendToast(getString(R.string.messageRemoved));
+                sendToast("To do list removed");
                 storeTodo();
                 return false;
 
             }
+        });
+
+
+        todoList.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent todoListIntent = new Intent(MainActivity.this, TodoListActivity.class);
+                todoListIntent.putExtra("listId", position);
+                String listName = todoList.getItemAtPosition(position).toString();
+                todoListIntent.putExtra("listName", listName);
+                startActivity(todoListIntent);
+                finish();
+            }
+
         });
 
         // set a event on button click to add the edittect content
@@ -94,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(todoEdit.getText().toString() == "") sendToast("insert a to-do item");
+                if(todoEdit.getText().toString() == "") sendToast("insert a new to-do list");
                 else {
                     todoArray.add(todoEdit.getText().toString());
                     todoAdapter.notifyDataSetChanged();
@@ -106,19 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
         });
 
-        // set an event on button click to clear the list
-        clearButton.setOnClickListener(new View.OnClickListener() {
-
-           @Override
-           public void onClick(View v) {
-
-               clearTodo();
-               sendToast(getString(R.string.messageCleared));
-
-           }
-       });
-
-        // i don't know... helper created by setOnLongClickListener
+       // i don't know... helper created by setOnLongClickListener
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
@@ -170,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         // write to a file
         PrintStream out = null;
         try {
-            out = new PrintStream(openFileOutput("todo.txt", MODE_PRIVATE));
+            out = new PrintStream(openFileOutput("todolists.txt", MODE_PRIVATE));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -185,17 +192,6 @@ public class MainActivity extends AppCompatActivity {
         out.close();
     }
 
-    // function to clear to-do list
-    public void clearTodo(){
-
-        // creating text string by first deleting the whole file.
-
-        todoArray.clear();
-        storeTodo();
-        todoAdapter.notifyDataSetChanged();
-
-    }
-
     // function to display a popup messgage
     public void sendToast(String message){
 
@@ -208,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
         // read a file and store each line in array
         try {
-            Scanner scan = new Scanner(openFileInput("todo.txt"));
+            Scanner scan = new Scanner(openFileInput("todolists.txt"));
 
             while (scan.hasNextLine()) {
                 String line = scan.nextLine();
